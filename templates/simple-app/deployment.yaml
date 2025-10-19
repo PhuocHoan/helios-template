@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .AppName }}
+  namespace: {{ .Namespace }}
+spec:
+  replicas: {{ .Replicas }}
+  selector:
+    matchLabels:
+      app: {{ .AppName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .AppName }}
+    spec:
+      containers:
+      - name: app
+        image: {{ .ImageRepo }}:{{ .ImageTag }}
+        ports:
+        - containerPort: {{ .Port }}
+        env:
+        - name: VERSION
+          value: "{{ .ImageTag }}"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .AppName }}
+  namespace: {{ .Namespace }}
+spec:
+  selector:
+    app: {{ .AppName }}
+  ports:
+  - port: 80
+    targetPort: {{ .Port }}
+  type: ClusterIP
